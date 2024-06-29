@@ -1,0 +1,6 @@
+.env
+*.csv
+bin
+
+Assets
+faiss
