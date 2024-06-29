@@ -47,26 +47,27 @@ st.title("Document Analysis App")
 
 st.write("Please upload your PDF or Word Doc file below.")
 
-uploaded_file = st.file_uploader("Upload a PDF or Word Doc file", type=["pdf", "doc", "docx"])
+uploaded_files = st.file_uploader("Upload a PDF or Word Doc file", type=["pdf", "doc", "docx"], accept_multiple_files=True)
 
-if uploaded_file is not None:
-    file_type = uploaded_file.name.split('.')[-1].lower()
-    
-    with st.spinner("Processing your document..."):
-        # Save the uploaded file temporarily
-        with open(uploaded_file.name, "wb") as f:
-            f.write(uploaded_file.getbuffer())
+if uploaded_files:
+    for uploaded_file in uploaded_files:
+        file_type = uploaded_file.name.split('.')[-1].lower()
         
-        # Update the Faiss vectorstore with the uploaded file
-        db = update_faiss_vectorstore(uploaded_file.name, file_type)
+        with st.spinner("Processing your document..."):
+            # Save the uploaded file temporarily
+            with open(uploaded_file.name, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+            
+            # Update the Faiss vectorstore with the uploaded file
+            db = update_faiss_vectorstore(uploaded_file.name, file_type)
         
-    
+        
     st.success("Document processed successfully!")
 
 query = st.text_area("Enter your query about the document")
 
 if st.button("Submit Query", type="primary"):
-    if 'db' not in locals() or db is None:
+    if 'db' not in locals():
         st.error("Please upload a document first.")
     else:
         with st.spinner("Analyzing..."):
