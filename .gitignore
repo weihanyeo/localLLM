@@ -4,3 +4,7 @@ bin
 
 Assets
 faiss
+## dont upload documents to the web :((
+*.pdf
+*.doc
+*.docx
