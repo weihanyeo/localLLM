@@ -60,31 +60,13 @@ if uploaded_file is not None:
         # Update the Faiss vectorstore with the uploaded file
         db = update_faiss_vectorstore(uploaded_file.name, file_type)
         
-        # Remove the temporary file
-        # os.remove(uploaded_file.name)
     
     st.success("Document processed successfully!")
 
 query = st.text_area("Enter your query about the document")
 
-# if st.button("Submit Query", type="primary"):
-#     if 'db' not in locals():
-#         st.error("Please upload a document first.")
-#     else:
-#         with st.spinner("Analyzing..."):
-#             # Create an agent from the vectorstore
-#             agent = create_agent(db)
-
-#             # Query the agent
-#             response = query_agent(agent=agent, query=query)
-
-#             # Display the response
-#             st.write("Response:")
-#             st.write(response)
-#             print("done")
-
 if st.button("Submit Query", type="primary"):
-    if 'db' not in locals():
+    if 'db' not in locals() or db is None:
         st.error("Please upload a document first.")
     else:
         with st.spinner("Analyzing..."):
