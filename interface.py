@@ -87,9 +87,9 @@ if uploaded_files:
         file_type = uploaded_file.name.split('.')[-1].lower()
         file_path = os.path.join("./Assets", uploaded_file.name)
         
-        with st.spinner("Processing your document..."):
+        with st.spinner("Processing {uploaded_file.name} document..."):
             # Save the uploaded file temporarily
-            with open(uploaded_file.name, "wb") as f:
+            with open(file_path, "wb") as f:
                 f.write(uploaded_file.getbuffer())
 
             st.success(f"File {uploaded_file.name} saved to ./Assets folder")
