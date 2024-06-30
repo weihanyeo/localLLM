@@ -8,11 +8,6 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.document_loaders import TextLoader, Docx2txtLoader, PyPDFLoader
 import os
 
-# Global variables
-embeddings = None
-texts = []
-db = None  # Initialize db as None
-
 # Initialize embeddings
 embeddings = HuggingFaceInstructEmbeddings(
     model_name="hkunlp/instructor-large",
@@ -38,8 +33,8 @@ except Exception as e:
     st.error(f"Error loading existing database: {str(e)}")
     st.info("Starting with a fresh database. Please upload a document to get started.")
 
-def update_faiss_vectorstore(file_path, file_type):
-    global embeddings, 
+def update_faiss_vectorstore(file_path):
+    global embeddings
     
     all_texts = []
     for file_path in file_paths:
@@ -52,10 +47,10 @@ def update_faiss_vectorstore(file_path, file_type):
             st.error(f"Invalid file type for {file_path}. Skipping.")
             continue
 
-    documents = loader.load()
-    splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-    texts = splitter.split_documents(documents)
-    all_texts.extend(texts)
+        documents = loader.load()
+        splitter = RecursiveCharacterTextSplitter(chunk_size=50, chunk_overlap=5)
+        texts = splitter.split_documents(documents)
+        all_texts.extend(texts)
 
     try:
         # Try to load the existing FAISS index from the local file
@@ -80,27 +75,24 @@ st.write("Please upload your PDF or Word Doc file below.")
 uploaded_files = st.file_uploader("Upload a PDF or Word Doc file", type=["pdf", "doc", "docx"], accept_multiple_files=True)
 
 if uploaded_files:
-
+    file_paths = []
     for uploaded_file in uploaded_files:
-        file_type = uploaded_file.name.split('.')[-1].lower()
         file_path = os.path.join("./assets", uploaded_file.name)
         
         with st.spinner("Processing {uploaded_file.name} document..."):
             # Save the uploaded file temporarily
             with open(file_path, "wb") as f:
                 f.write(uploaded_file.getbuffer())
-
+            file_paths.append(file_path)
             st.success(f"File {uploaded_file.name} saved to ./assets folder")
             
-            # Update the Faiss vectorstore with the uploaded file
-            try:
-                db = update_faiss_vectorstore(file_path, file_type)
-                if db is not None:
-                    st.success("Document processed successfully!")
-                else:
-                    st.error("Failed to process the document. Please try again.")
-            except Exception as e:
-                st.error(f"Error processing document: {str(e)}")
+    with st.spinner("Vectorising contents..."):
+        db = update_faiss_vectorstore(file_paths)
+
+    if db is not None:
+        st.success("All documents processed successfully!")
+    else:
+        st.error("Failed to process the documents. Please try again.")
         
     st.success("Document processed successfully!")
 

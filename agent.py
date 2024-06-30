@@ -69,6 +69,6 @@ def query_agent(agent, query):
     # Format the response
     formatted_response = f"Answer: {answer}\n\nSources:\n"
     for i, doc in enumerate(sources, 1):
-        formatted_response += f"{i}. {doc.metadata.get('source', 'Unknown')}: {doc.page_content[:100]}...\n"
+        formatted_response += f"{i}. {doc.metadata.get('source', 'Unknown')}: {doc.page_content[:500]}...\n"
 
     return formatted_response
