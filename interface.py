@@ -1,8 +1,6 @@
 import streamlit as st
-import pandas as pd
-import json
 from agent import create_agent, query_agent
-from langchain.embeddings import HuggingFaceEmbeddings, HuggingFaceInstructEmbeddings
+from langchain.embeddings import HuggingFaceInstructEmbeddings
 from langchain.vectorstores import FAISS
 from PyPDF2 import PdfReader
 from langchain.document_loaders import DirectoryLoader

@@ -1,6 +1,4 @@
 from langchain.llms import CTransformers
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.vectorstores import FAISS
 from langchain import PromptTemplate
 from langchain.chains import RetrievalQA
 from langchain.callbacks import AsyncIteratorCallbackHandler
@@ -10,15 +8,15 @@ def create_agent(vectorstore):
     # callback_handler = AsyncIteratorCallbackHandler()
     
     config = {
-        'max_new_tokens': 2048, 
-        'temperature': 0.02, 
-        'context_length': 20000,
+        'max_new_tokens': 512, 
+        'temperature': 0.05, 
+        'context_length': 2000,
         'threads': os.cpu_count()
     }
 
     llm = CTransformers(
-        model="TheBloke/Llama-2-7B-Chat-GGML",
-        model_file="llama-2-7b-chat.ggmlv3.q4_0.bin",
+        model="TheBloke/CapybaraHermes-2.5-Mistral-7B-GGUF",
+        model_file="capybarahermes-2.5-mistral-7b.Q5_K_M.gguf",
         model_type="llama",
         config=config,
         # callbacks=[callback_handler],
@@ -26,6 +24,8 @@ def create_agent(vectorstore):
     )
     # TheBloke/CapybaraHermes-2.5-Mistral-7B-GGUF
     # capybarahermes-2.5-mistral-7b.Q6_K.gguf
+    # model="TheBloke/Llama-2-7B-Chat-GGML",
+    # model_file="llama-2-7b-chat.ggmlv3.q4_0.bin",
 
     retriever = vectorstore.as_retriever(search_kwargs={'k': 2})
 
