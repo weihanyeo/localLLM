@@ -14,7 +14,7 @@ if not os.path.exists("./assets"):
 def update_faiss_vectorstore():
     # Initialize embeddings
     embeddings = HuggingFaceInstructEmbeddings(
-        model_name="hkunlp/instructor-large",
+        model_name="hkunlp/instructor-large", # model_name="sentence-transformers/all-MiniLM-L6-v2",
         model_kwargs={"device": "cpu"}
     )
     
@@ -35,7 +35,7 @@ def update_faiss_vectorstore():
             continue
 
         documents = loader.load()
-        splitter = RecursiveCharacterTextSplitter(chunk_size=50, chunk_overlap=5)
+        splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
         texts = splitter.split_documents(documents)
         all_texts.extend(texts)
 
