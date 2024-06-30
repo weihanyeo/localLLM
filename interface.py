@@ -19,6 +19,14 @@ embeddings = HuggingFaceInstructEmbeddings(
     model_kwargs={"device": "cpu"}
 )
 
+# Create ./faiss directory if it doesn't exist
+if not os.path.exists("./faiss"):
+    os.makedirs("./faiss", exist_ok=True)
+
+# Create ./assets directory if it doesn't exist
+if not os.path.exists("./assets"):
+    os.makedirs("./assets", exist_ok=True)
+
 # Try to load existing FAISS index
 try:
     if os.path.exists("faiss/index.faiss"):
@@ -31,27 +39,23 @@ except Exception as e:
     st.info("Starting with a fresh database. Please upload a document to get started.")
 
 def update_faiss_vectorstore(file_path, file_type):
-    global embeddings, texts
-
-    embeddings = HuggingFaceInstructEmbeddings(
-        model_name="hkunlp/instructor-large",
-        model_kwargs={"device": "cpu"}
-    )
-
-    if file_type == 'pdf':
-        loader = PyPDFLoader(file_path)
-    elif file_type in ['doc', 'docx']:
-        loader = Docx2txtLoader(file_path)
-    else:
-        st.error("Invalid file type. Please upload a PDF or Word Doc file.")
-        return None
+    global embeddings, 
+    
+    all_texts = []
+    for file_path in file_paths:
+        file_type = file_path.split('.')[-1].lower()
+        if file_type == 'pdf':
+            loader = PyPDFLoader(file_path)
+        elif file_type in ['doc', 'docx']:
+            loader = Docx2txtLoader(file_path)
+        else:
+            st.error(f"Invalid file type for {file_path}. Skipping.")
+            continue
 
     documents = loader.load()
     splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
     texts = splitter.split_documents(documents)
-
-    if not os.path.exists("faiss"):
-        os.makedirs("faiss")
+    all_texts.extend(texts)
 
     try:
         # Try to load the existing FAISS index from the local file
@@ -73,24 +77,20 @@ st.title("Document Analysis App")
 
 st.write("Please upload your PDF or Word Doc file below.")
 
-# Create ./Assets directory if it doesn't exist
-if not os.path.exists("./Assets"):
-    os.makedirs("./Assets", exist_ok=True)
-
 uploaded_files = st.file_uploader("Upload a PDF or Word Doc file", type=["pdf", "doc", "docx"], accept_multiple_files=True)
 
 if uploaded_files:
 
     for uploaded_file in uploaded_files:
         file_type = uploaded_file.name.split('.')[-1].lower()
-        file_path = os.path.join("./Assets", uploaded_file.name)
+        file_path = os.path.join("./assets", uploaded_file.name)
         
         with st.spinner("Processing {uploaded_file.name} document..."):
             # Save the uploaded file temporarily
             with open(file_path, "wb") as f:
                 f.write(uploaded_file.getbuffer())
 
-            st.success(f"File {uploaded_file.name} saved to ./Assets folder")
+            st.success(f"File {uploaded_file.name} saved to ./assets folder")
             
             # Update the Faiss vectorstore with the uploaded file
             try:
