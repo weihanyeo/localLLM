@@ -2,38 +2,46 @@ from accelerate import Accelerator
 from langchain.llms import CTransformers
 from langchain import PromptTemplate
 from langchain.chains import RetrievalQA
-from langchain.callbacks import AsyncIteratorCallbackHandler
 import os
 
 accelerator = Accelerator()
 
 def create_agent(vectorstore):
-    # callback_handler = AsyncIteratorCallbackHandler()
     
     config = {
         'max_new_tokens': 4060, 
-        'temperature': 0.05, 
+        'temperature': 0.01, 
         'context_length': 20000,
-        'threads': os.cpu_count()
+        'threads': os.cpu_count()-1
     }
 
     llm = CTransformers(
-        model="TheBloke/CapybaraHermes-2.5-Mistral-7B-GGUF",
-        model_file="capybarahermes-2.5-mistral-7b.Q5_K_M.gguf",
+        model="TheBloke/Llama-2-7B-Chat-GGML",
+        model_file="llama-2-7b-chat.ggmlv3.q4_0.bin",
         model_type="llama",
-        config=config,
-        # callbacks=[callback_handler],
-        # streaming=True
+        config=config
     )
     # TheBloke/CapybaraHermes-2.5-Mistral-7B-GGUF
     # capybarahermes-2.5-mistral-7b.Q6_K.gguf
-    # model="TheBloke/Llama-2-7B-Chat-GGML",
-    # model_file="llama-2-7b-chat.ggmlv3.q4_0.bin",
+    # TheBloke/Llama-2-7B-Chat-GGML
+    # llama-2-7b-chat.ggmlv3.q4_0.bin
 
     # Prepare llm to accelerate
     llm, config = accelerator.prepare(llm, config)
 
     retriever = vectorstore.as_retriever(search_kwargs={'k': 2})
+
+    template = """Use the following pieces of information to answer the user's question.
+    If you don't know the answer, just say that you don't know, don't try to make up an answer.
+    Determine the most appropriate answer and always refer and revisit the given documents.
+
+    Context: {context}
+    Question: {question}
+
+    Only return the helpful answer below and nothing else.
+    Helpful answer:
+    """
+    prompt = PromptTemplate(template=template, input_variables=['context', 'question'])
 
     qa_llm = RetrievalQA.from_chain_type(
         llm=llm,
@@ -46,23 +54,7 @@ def create_agent(vectorstore):
     return qa_llm
 
 def query_agent(agent, query):
-
-    template = """Use the following pieces of information to answer the user's question.
-    If you don't know the answer, just say that you don't know, don't try to make up an answer.
-    Determine the most appropriate answer and always refer and revisit the given documents.
-
-    Context: {context}
-    Question: {query}
-
-    Only return the helpful answer below and nothing else.
-    Helpful answer:
-    """
-
-    prompt = PromptTemplate(
-    template=template,
-    input_variables=['context', 'query'])
-
-    response = agent(prompt)
+    response = agent({"query": query})
     
     # Extract the answer and sources
     answer = response['result']
@@ -71,6 +63,8 @@ def query_agent(agent, query):
     # Format the response
     formatted_response = f"Answer: {answer}\n\nSources:\n"
     for i, doc in enumerate(sources, 1):
-        formatted_response += f"{i}. {doc.metadata.get('source', 'Unknown')}: {doc.page_content[:500]}...\n"
+        file_name = os.path.basename(doc.metadata.get('source', 'Unknown'))
+        formatted_response += f"{i}. File: {file_name}\n"
+        formatted_response += f"   Content: {doc.page_content[:500]}...\n\n"
 
     return formatted_response

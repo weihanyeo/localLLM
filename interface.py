@@ -14,7 +14,7 @@ if not os.path.exists("./assets"):
 def update_faiss_vectorstore():
     # Initialize embeddings
     embeddings = HuggingFaceInstructEmbeddings(
-        model_name="hkunlp/instructor-large", # model_name="sentence-transformers/all-MiniLM-L6-v2",
+        model_name="sentence-transformers/facebook-dpr-ctx_encoder-single-nq-base",
         model_kwargs={"device": "cpu"}
     )
     
