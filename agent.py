@@ -12,7 +12,7 @@ def create_agent(vectorstore):
         'max_new_tokens': 4060, 
         'temperature': 0.01, 
         'context_length': 20000,
-        'threads': os.cpu_count()-1
+        'threads': os.cpu_count()
     }
 
     llm = CTransformers(
