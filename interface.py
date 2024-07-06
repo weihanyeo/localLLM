@@ -15,7 +15,7 @@ if not os.path.exists("./assets"):
 def update_faiss_vectorstore():
     # Initialize embeddings
     embeddings = HuggingFaceInstructEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2",
+        model_name="sentence-transformers/all-MiniLM-L12-v2",
         model_kwargs={"device": "cpu"}
     )
     
@@ -82,7 +82,7 @@ if st.button("Submit Query", type="primary"):
             if 'source_documents' in response:
                 st.markdown("**Sources:**")
                 for i, doc in enumerate(response['source_documents'], 1):
-                    st.markdown(f"{i}. {doc.metadata.get('thisssource', 'Unknown source')}")
+                    st.markdown(f"{i}. {doc.metadata.get('source', 'Unknown source')}")
                     st.text(doc.page_content[:500] + "..." if len(doc.page_content) > 500 else doc.page_content)
 
             # Stops and Display timing

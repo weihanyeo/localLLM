@@ -59,7 +59,7 @@ def query_agent(agent, query):
     formatted_response = f" {answer}\n\nSources:\n"
     for i, doc in enumerate(sources, 1):
         file_name = os.path.basename(doc.metadata.get('source', 'Unknown'))
-        formatted_response += f"{i}. File: {file_name}\n"
+        formatted_response += f"{i}. Local File: {file_name}\n"
         formatted_response += f"   Content: {doc.page_content[:750]}...\n\n"
 
     return formatted_response
