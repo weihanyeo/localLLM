@@ -4,20 +4,20 @@ from langchain import PromptTemplate
 from langchain.chains import RetrievalQA
 import os
 
-accelerator = Accelerator()
+# accelerator = Accelerator()
 
 def create_agent(vectorstore):
     
     config = {
-        'max_new_tokens': 4060, 
-        'temperature': 0.01, 
-        'context_length': 20000,
+        'max_new_tokens': 512, 
+        'temperature': 0.2, 
+        'context_length': 512,
         'threads': os.cpu_count()
     }
 
     llm = CTransformers(
-        model="TheBloke/Llama-2-7B-Chat-GGML",
-        model_file="llama-2-7b-chat.ggmlv3.q4_0.bin",
+        model="./pretrainedLLM.bin",
+        # model_file="capybarahermes-2.5-mistral-7b.Q5_0.gguf",
         model_type="llama",
         config=config
     )
@@ -27,7 +27,7 @@ def create_agent(vectorstore):
     # llama-2-7b-chat.ggmlv3.q4_0.bin
 
     # Prepare llm to accelerate
-    llm, config = accelerator.prepare(llm, config)
+    # llm, config = accelerator.prepare(llm, config)
 
     retriever = vectorstore.as_retriever(search_kwargs={'k': 2})
 
