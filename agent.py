@@ -4,30 +4,25 @@ from langchain import PromptTemplate
 from langchain.chains import RetrievalQA
 import os
 
-# accelerator = Accelerator()
+accelerator = Accelerator()
 
 def create_agent(vectorstore):
     
     config = {
-        'max_new_tokens': 512, 
+        'max_new_tokens': 5120, 
         'temperature': 0.2, 
-        'context_length': 512,
+        'context_length': 51200,
         'threads': os.cpu_count()
     }
 
     llm = CTransformers(
         model="./pretrainedLLM.bin",
-        # model_file="capybarahermes-2.5-mistral-7b.Q5_0.gguf",
         model_type="llama",
         config=config
     )
-    # TheBloke/CapybaraHermes-2.5-Mistral-7B-GGUF
-    # capybarahermes-2.5-mistral-7b.Q6_K.gguf
-    # TheBloke/Llama-2-7B-Chat-GGML
-    # llama-2-7b-chat.ggmlv3.q4_0.bin
 
     # Prepare llm to accelerate
-    # llm, config = accelerator.prepare(llm, config)
+    llm, config = accelerator.prepare(llm, config)
 
     retriever = vectorstore.as_retriever(search_kwargs={'k': 2})
 
@@ -61,10 +56,10 @@ def query_agent(agent, query):
     sources = response['source_documents']
 
     # Format the response
-    formatted_response = f"Answer: {answer}\n\nSources:\n"
+    formatted_response = f" {answer}\n\nSources:\n"
     for i, doc in enumerate(sources, 1):
         file_name = os.path.basename(doc.metadata.get('source', 'Unknown'))
         formatted_response += f"{i}. File: {file_name}\n"
-        formatted_response += f"   Content: {doc.page_content[:500]}...\n\n"
+        formatted_response += f"   Content: {doc.page_content[:750]}...\n\n"
 
     return formatted_response

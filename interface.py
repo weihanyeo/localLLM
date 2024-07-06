@@ -6,6 +6,7 @@ from langchain.document_loaders import DirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.document_loaders import TextLoader, Docx2txtLoader, PyPDFLoader
 import os
+import time
 
 # Create ./assets directory if it doesn't exist
 if not os.path.exists("./assets"):
@@ -40,6 +41,7 @@ def update_faiss_vectorstore():
         all_texts.extend(texts)
 
     db = FAISS.from_documents(all_texts, embeddings)
+    st.success("Vector store updated sucessfully")
     return db
 
 st.title("Document Analysis App")
@@ -66,14 +68,25 @@ if st.button("Submit Query", type="primary"):
         db = update_faiss_vectorstore()
         
         if db is not None:
+            time_start = time.time()
             # Create an agent from the vectorstore
             agent = create_agent(db)
-
             # Query the agent
             response = query_agent(agent=agent, query=query)
 
-            # Display the response
-            st.write("Response:")
-            st.write(response)
+            # Display question and answer
+            st.markdown(f"**Question:** {query}")
+            st.markdown(f"**Answer:** {response}")
+
+            # Display sources if available
+            if 'source_documents' in response:
+                st.markdown("**Sources:**")
+                for i, doc in enumerate(response['source_documents'], 1):
+                    st.markdown(f"{i}. {doc.metadata.get('thisssource', 'Unknown source')}")
+                    st.text(doc.page_content[:500] + "..." if len(doc.page_content) > 500 else doc.page_content)
+
+            # Stops and Display timing
+            time_elapsed = time.time() - time_start 
+            st.code(f"Response time: {time_elapsed:.02f} sec")
         else:
             st.error("Failed to process the documents. Please make sure you have uploaded at least one supported file.")
