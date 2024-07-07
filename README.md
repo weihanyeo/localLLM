@@ -2,14 +2,14 @@
 
 ## Learn more from Your Data (PDF + word) with Langchain and Streamlit
 
-#### Hardware requiments
+### Hardware requiments
 - **Minimum RAM**: 8 GB or higher
 - **Decent CPU**: 10-12 core
 
 ### Software Requirements
 - **Anaconda**: Recommended for managing Python environments
 
-### Steps
+## Steps
 ### 1. Install Anaconda
 If you haven't already, download and install Anaconda from [Anaconda's website](https://www.anaconda.com/products/distribution).
 
@@ -32,16 +32,17 @@ Navigate to the directory where you have cloned your project:
 cd `C://{your cloned directory}
 ```
 
-#### 5. Install Packages
+### 5. Install Packages
 Install the necessary Python packages listed in requirements.txt:
 ```bash
 pip install -r requirements.txt
 ```
 
-####  5. Run app
+###  5. Run app
 Run the Streamlit application using the following command:
 ```bash
 streamlit run interface.py
 ```
-this opens app [http://localhost:8501/](http://localhost:8501/)
-More on Streamlit application [Streamlit documentation](https://docs.streamlit.io/)
+This opens app [http://localhost:8501/](http://localhost:8501/)
+
+Read more on Streamlit application [Streamlit documentation](https://docs.streamlit.io/)
