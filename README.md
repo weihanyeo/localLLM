@@ -38,7 +38,7 @@ Install the necessary Python packages listed in requirements.txt:
 pip install -r requirements.txt
 ```
 
-###  5. Run app
+### Run app
 Run the Streamlit application using the following command:
 ```bash
 streamlit run interface.py
