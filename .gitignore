@@ -1,13 +1,13 @@
 .env
-*.csv
-bin
 
 assets
 FAISS
 PastConvo
 offload
-models
+
 ## dont upload documents to the web :((
 *.pdf
 *.doc
+*.txt
+*.csv
 *.docx
