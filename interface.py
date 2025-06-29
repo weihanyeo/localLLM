@@ -65,7 +65,7 @@ with st.sidebar:
                         f.write(uploaded_file.getbuffer())
                     if processor.process_new_file(file_path):
                         st.success(f"{uploaded_file.name} successfully indexed.")
-                        st.experimental_rerun()
+                        st.rerun()
                     else:
                         st.error(f"Processing failed for {uploaded_file.name}.")
                 except Exception as e:
@@ -86,7 +86,7 @@ with st.sidebar:
             if convo and 'messages' in convo:
                 st.session_state.chat_history = convo['messages']
                 st.session_state.loaded_conversation = past_convos[idx]['session_id']
-                st.experimental_rerun()
+                st.rerun()
 
     if st.button("Start New Conversation"):
         if st.session_state.chat_history:
@@ -97,7 +97,7 @@ with st.sidebar:
         st.session_state.chat_history = []
         st.session_state.loaded_conversation = None
         st.session_state.session_id = str(uuid.uuid4())
-        st.experimental_rerun()
+        st.rerun()
 
 # Main Interface - Chat Panel
 st.title("💬 Document Analysis Chat")
@@ -157,7 +157,7 @@ if submitted and prompt.strip():
             time_elapsed = time.time() - time_start
             st.sidebar.info(f"Response time: {time_elapsed:.2f}s")
 
-            st.experimental_rerun()
+            st.rerun()
         else:
             st.error("No documents indexed. Please upload documents first.")
             st.session_state.chat_history.append({
