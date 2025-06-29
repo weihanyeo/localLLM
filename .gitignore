@@ -2,8 +2,11 @@
 *.csv
 bin
 
-Assets
-faiss
+assets
+FAISS
+PastConvo
+offload
+models
 ## dont upload documents to the web :((
 *.pdf
 *.doc
